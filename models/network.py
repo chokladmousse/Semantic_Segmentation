@@ -26,7 +26,7 @@ class Trainer(nn.Module):
         else:
             combined_preds = self.model(inputs)
             loss = self.calc_loss(labels, combined_preds)
-            return loss
+            return loss, combined_preds
 
 def make_network(configs):
     train_cfg = configs['train']
@@ -35,13 +35,15 @@ def make_network(configs):
     
     network_lib = importlib.import_module('models.' + config['network']['model'])
     loss_func = importlib.import_module('loss_functions')
+    
+    network = network_lib.Network(config)
+    forward_net = DataParallel(network.to(configs['device']))
+
     loss = loss_func.DiceLoss(config)
     
     def calc_loss(out, labels):
         return loss(out, labels)
-    
-    network = network_lib.Network(config)
-    forward_net = DataParallel(network.to(configs['device']))
+
     config['net'] = Trainer(forward_net, calc_loss)
     
     ## optimizer, experiment setup
@@ -50,14 +52,21 @@ def make_network(configs):
 
     exp_path = os.path.join('exp', configs['opt'].exp)
     
-    logger = open(os.path.join(exp_path, 'log'), 'a+')
+    logger_loss = open(os.path.join(exp_path, 'log'), 'a+')
+    logger_acc  = open(os.path.join(exp_path, 'acc'), 'a+')
+    logger_IoU  = open(os.path.join(exp_path, 'IoU'), 'a+')
     
+    scale = config['scale']
+    n     = config['num_class']
+
     def make_train(config, phase, dataloader):
         optimizer = train_cfg['optimizer']
         net = config['inference']['net']
         net = net.train()
         
         total_loss = 0
+        total_acc  = torch.zeros(config['inference']['max_stack'])
+        total_IoU  = torch.zeros(config['inference']['max_stack'])
         if phase != 'test':
             for iter, (inputs, labels) in tqdm.tqdm(enumerate(dataloader), total=len(dataloader), ascii=True):
                 labels = labels.squeeze(1)
@@ -68,20 +77,39 @@ def make_network(configs):
                 inputs = inputs.to(config['device'])
                 labels = labels.to(device=config['device'], dtype=torch.int64)
 
-                loss = net(inputs, labels)
-                
+                loss, combined_preds = net(inputs, labels)
+
                 if phase == 'train':
                     # backpropagate
                     loss.backward()
                     # update the weights
                     optimizer.step()
 
-                toprint = "\n " + phase + "{}, iter{}, loss: {}".format(config['train']['epoch'], iter, loss.item())
-                logger.write(toprint)
-                logger.flush()
-                
                 total_loss += loss.detach().item()
-            return total_loss / len(dataloader)
+                
+                acc, IoU = get_performance(combined_preds, labels[:,::scale,::scale], n)
+                total_acc += acc
+                total_IoU += IoU
+            
+            total_loss /= len(dataloader)
+            total_acc  /= len(dataloader)
+            total_IoU  /= len(dataloader)
+
+            toprint = "\n" + phase + str(config['train']['epoch']) + " "
+            logger_loss.write(toprint + str(total_loss))
+            logger_acc.write(toprint)
+            logger_IoU.write(toprint)
+            logger_loss.flush()
+            logger_IoU.flush()
+            logger_acc.flush()
+
+            for i in range(total_acc.size(0)):
+              logger_acc.write(" " + str(acc[i].item()))
+              logger_IoU.write(" " + str(IoU[i].item()))
+              logger_acc.flush()
+              logger_IoU.flush()
+
+            return total_loss
         else:
             net = net.eval()
             
@@ -89,11 +117,34 @@ def make_network(configs):
                 labels = labels.squeeze(1)
                 
                 result = net(inputs)
-                print(result.size())
-                error(':)')
+
+                acc, IoU = get_performance(result, labels[:,::scale,::scale])
+                total_acc += acc
+                total_IoU += IoU
             
-            # TODO: IoU and accuracy of result
-            
-            return out
+            total_acc  /= len(dataloader)
+            total_IoU  /= len(dataloader)
+
+            print("Total accuracy on test set: " + str(total_acc))
+            print("Mean IoU on test set:       " + str(total_IoU))
 
     return make_train
+
+def get_performance(combined_preds, labels, n):
+  labels = labels.unsqueeze(1)
+  preds = combined_preds.argmax(2)
+
+  acc = torch.mean(((preds == labels) & (labels != 9)).float(), dim=0).mean(dim=-1).mean(dim=-1).cpu()
+
+  IoU = torch.empty(combined_preds.size(1), n-1)
+  
+  for i in range(n-1):
+    pred_inds   = preds == i
+    target_inds = labels == i
+
+    intersection = (pred_inds & target_inds).sum(dim=0).sum(dim=-1).sum(dim=-1).cpu()
+    union        = (pred_inds | target_inds).sum(dim=0).sum(dim=-1).sum(dim=-1).cpu()
+
+    IoU[:,i] = intersection / union
+
+  return acc, IoU.nanmean(dim=1)
