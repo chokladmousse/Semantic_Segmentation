@@ -4,6 +4,8 @@ import torch.nn.functional as F
 # from torch.autograd import Variable
 # from torch.nn import CrossEntropyLoss
 
+import matplotlib.pyplot as plt
+
 class DiceLoss(nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -19,6 +21,7 @@ class DiceLoss(nn.Module):
         input:  shape is (B, S, C, H, W)
         target: shape is (B, H, W)
         """
+        target = target[:,::self.scale,::self.scale]
         
         # Cross-entropy loss
         cross_total = 0
