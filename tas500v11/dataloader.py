@@ -24,7 +24,6 @@ def init(config):
         
     def gen(phase):
         batchsize = config['train']['batchsize']
-        batchnum = config['train']['{}_iters'.format(phase)]
         
         if   phase == 'train':
             return train_loader
