@@ -4,28 +4,33 @@ from torch import nn
 
 class Network(nn.Module):
     def __init__(self, config):
-        super(Network, self).__init__()
-        base_network = importlib.import_module('models.base.' + config['network']['base']).Network
+      super(Network, self).__init__()
+      # Network libraries chosen in config
+      pre_network  = importlib.import_module('models.prenet.' + config['network']['prenet']).Network
+      base_network = importlib.import_module('models.base.' + config['network']['base']).Network
     
-        self.num_class = config['num_class']
-        self.max_stack = config['max_stack']
-        self.init_net = base_network(config)
+      self.num_class = config['num_class']
+      self.max_stack = config['max_stack']
+      # Networks which distills the information in the image and computes segmentation
+      self.prenet    = pre_network(config)
+      self.net       = base_network(config)
+      
+      # Convolutional layer for classification and activation function
+      self.classifier = nn.Conv2d(config['f'], config['num_class'], 1)
+      self.ReLU  = nn.LeakyReLU(inplace=True)
         
-        self.conv = nn.Conv2d(3, config['f'], 3, padding=1)
-        self.classifier = nn.Conv2d(config['f'], config['num_class'], 1)
-        self.ReLU  = nn.LeakyReLU(inplace=True)
-        
-        if   config['normalization'] == 'batch':
-            self.bn1 = nn.BatchNorm2d(config['f'])
-            self.bn2 = nn.BatchNorm2d(config['num_class'])
-        elif config['normalization'] == 'layer':
-            self.bn1 = nn.LayerNorm([config['f'], config['oup_dim'][0], config['oup_dim'][1]])
-            self.bn2 = nn.LayerNorm([config['num_class'], config['oup_dim'][0], config['oup_dim'][1]])
-        else:
-            raise Exception('Not a valid normalization')
+      # Normalization layer
+      if   config['normalization'] == 'batch':
+        self.bn = nn.BatchNorm2d(config['num_class'])
+      elif config['normalization'] == 'layerHW':
+        self.bn = nn.LayerNorm([config['oup_dim'][0], config['oup_dim'][1]])
+      elif config['normalization'] == 'layerCHW':
+        self.bn = nn.LayerNorm([config['num_class'], config['oup_dim'][0], config['oup_dim'][1]])
+      else:
+        raise Exception('Not a valid normalization')
         
     def forward(self, x):
-        init   = self.ReLU(self.bn1(self.conv(x)))
-        hidden = self.init_net(init)
-        out    = self.ReLU(self.bn2(self.classifier(hidden))).unsqueeze(1)
-        return out
+      init   = self.prenet(x)
+      hidden = self.net(init)
+      out    = self.ReLU(self.bn(self.classifier(hidden))).unsqueeze(1)
+      return out
