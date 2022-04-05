@@ -27,8 +27,6 @@ def parse_command_line():
     args = parser.parse_args()
     return args
 
-
-# TODO: load network if it exists, otherwise make new network
 def reload(config):
     """
     load or initialize model's parameters by config from config['opt'].continue_exp
@@ -66,7 +64,8 @@ def reload(config):
     
     if opt.reset:
         open(os.path.join(resume, 'log'), 'w').close()
-        open(os.path.join(resume, 'log_mean'), 'w').close()
+        open(os.path.join(resume, 'acc'), 'w').close()
+        open(os.path.join(resume, 'IoU'), 'w').close()
         config['inference']['best_loss'] = float('inf')
 
     if 'epoch' not in config['train']:
@@ -96,6 +95,7 @@ def save(config, filename='checkpoint.pt'):
             'inference': {         
                 'M': config['inference']['M'],
                 'f': config['inference']['f'],
+                'n': config['inference']['n'],
                 'increase_ratio': config['inference']['increase_ratio'],
                 'normalization': config['inference']['normalization'],
                 'num_class': config['inference']['num_class'],
@@ -115,17 +115,15 @@ def train(train_func, data_func, config, post_epoch=None):
                 break
                 
         exp_path = os.path.join('exp', config['opt'].exp)
-        logger = open(os.path.join(exp_path, 'log_mean'), 'a+')
+        logger_loss = open(os.path.join(exp_path, 'log'), 'a+')
+        logger_acc  = open(os.path.join(exp_path, 'acc'), 'a+')
+        logger_IoU  = open(os.path.join(exp_path, 'IoU'), 'a+')
         for phase in ['train', 'valid']:
-            num_step = config['train']['{}_iters'.format(phase)]
             generator = data_func(phase)
             
             print('start', phase, config['opt'].exp)
             
             loss = train_func(config, phase, generator)
-            toprint = "\n " + phase + "{}, loss: {}".format(config['train']['epoch'], loss)    
-            logger.write(toprint)
-            logger.flush()
             
             if phase == 'valid' and loss < config['inference']['best_loss']:
                 config['inference']['best_loss'] = loss
