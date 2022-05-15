@@ -1,9 +1,13 @@
-# Semantic_Segmentation
+## Semantic_Segmentation
 Experiments with semantic segmentation on the tas500 dataset
 
 Two main network types are tested, an iterative network which tries to (iteratively) improve a semantic segmentation and the hourglass network which was successfully applied to the problem of pose estimation.
 
-Network models which are trained are an iterative network (network is applied several times to its own output) and an hourglass network. The iterative networks have the following structure
+## Network types
+
+# Iterative
+
+The iterative network type has an iterative network which is applied to its own output and possibly an initial network which generates an initial semantic segmentation.
 
 | Network       | Initial network | Copy input | Residual connections | Result |
 | ------------- | :-------------: | :--------: | :------------------: | ------ |
@@ -19,3 +23,5 @@ Initial network: An initial network produces a semantic segementation and then t
 Copy input: The input to the initial network (or the iterative network if there is no initial network) is copied and fed into the network at each iteration so the iterative network doesn't need to extract all the information from the input at once
 
 Residual connections: Residual connections from input to output of network
+
+# Hourglass
