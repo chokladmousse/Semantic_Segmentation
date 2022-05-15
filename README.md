@@ -81,7 +81,7 @@ The results for the network types trained for 100 epochs with ADAM in pytorch, l
 | res_Hourglass_iter    | 97.7               | 58.7     |
 | res_Hourglass_iter_ex | 88.9               | 56.7     |
 
-the networks which seemes to perform well were then trained with the same parameters for 250 epochs
+the networks which seemed to perform well were then trained with the same parameters for 250 epochs
 
 | Network               | Pixel Accuracy (%) | mIoU (%) |
 | --------------------- | ------------------ | -------- |
