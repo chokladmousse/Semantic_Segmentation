@@ -96,4 +96,4 @@ and the iterativeV6 network type was also trained with the same parameters but w
 | --------------------- | ------------------ | -------- |
 | IterativeV6           | 96.8               | 88.0     |
 
-The accuracy could be better but improvement does seem to happen at each iteration which can be seen on the plot of mIoU.
+The accuracy could be better but improvement does seem to happen at each iteration which can be seen on the plot of mIoU in the results folder
