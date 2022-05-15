@@ -11,9 +11,8 @@ def parse_command_line():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-e', '--exp', type=str, help='experiments name')
-    parser.add_argument('-loss', '--loss', type=str, default="Loss Per Epoch", help='Title of plot')
-    parser.add_argument('-acc', '--acc', type=str, default="Accuracy Per Epoch", help='Title of plot')
-    parser.add_argument('-IoU', '--IoU', type=str, default="mIoU per Epoch", help='Title of plot')
+    parser.add_argument('-name', '--name', type=str, default="", help='Name of model')
+    parser.add_argument('-av', '--average_window', type=int, default=1, help='Window for moving average of data')
     args = parser.parse_args()
     return args
 
@@ -42,7 +41,9 @@ def make_loss_plot(opt, log):
     plt.plot(np.arange(len(train_loss)), train_loss, label = "Train loss")
     plt.plot(np.arange(len(val_loss)), val_loss, label = "Validation loss")
     plt.legend()
-    plt.title(opt.loss)
+    plt.title('Loss ' + opt.name)
+    plt.grid()
+    plt.ylim(0,3)
     plt.savefig(plot_path, bbox_inches='tight')
     plt.close()
 
@@ -57,26 +58,54 @@ def make_performance_plot(opt, log):
     # Extract performance from each line and convert to float
     contents = np.array([[float(x) for x in line.split()[1:]] for line in contents[1:]])
     
-    train_loss = contents[::2]
-    val_loss = contents[1::2]
+    temp_train_loss = contents[::2]
+    temp_val_loss   = contents[1::2]
+    train_loss = np.empty((temp_train_loss.shape[0]-(opt.average_window-1),temp_train_loss.shape[1]))
+    val_loss   = np.empty((temp_val_loss.shape[0]-(opt.average_window-1),temp_val_loss.shape[1]))
 
+    if opt.average_window > 1:
+      for i in range(train_loss.shape[1]):
+        train_loss[:,i] = moving_average(temp_train_loss[:,i], n=opt.average_window)
+        val_loss[:,i]   = moving_average(temp_val_loss[:,i], n=opt.average_window)
+
+    plt.figure(figsize=(10,5))
+    ax = plt.subplot(1,2,1)
     for i in range(train_loss.shape[1]):
-      plt.plot(np.arange(len(train_loss)), train_loss[:,i], label = "Train " + log + " " + str(i))
-      plt.plot(np.arange(len(val_loss)), val_loss[:,i], label = "Validation " + log + " " + str(i))
-    plt.legend()
-    if   log == 'acc':
-      plt.title(opt.acc)
+      plt.plot(np.arange(len(train_loss)), train_loss[:,i], label = log + " " + str(i))
+    ax.set_ylim(0,1)
+    ax.grid()
+    
+    ax.legend()
+    if log == 'acc':
+      plt.title('Training Accuracy ' + opt.name)
     elif log == 'IoU':
-      plt.title(opt.IoU)
+      plt.title('Training mIoU ' + opt.name)
+    
+    ax = plt.subplot(1,2,2)
+    for i in range(train_loss.shape[1]):
+      plt.plot(np.arange(len(val_loss)), val_loss[:,i], label = log + " " + str(i))
+    ax.set_ylim(0,1)
+    ax.grid()
+    
+    ax.legend()
+    if log == 'acc':
+      plt.title('Validation Accuracy ' + opt.name)
+    elif log == 'IoU':
+      plt.title('Validation mIoU ' + opt.name)
+    
     plt.savefig(plot_path, bbox_inches='tight')
     plt.close()
+
+def moving_average(a, n=3) :
+    ret = np.cumsum(a, dtype=float)
+    ret[n:] = ret[n:] - ret[:-n]
+    return ret[n - 1:] / n
 
 if __name__ == "__main__":
     opt = init()
     make_loss_plot(opt, 'log')
     make_performance_plot(opt, 'acc')
     make_performance_plot(opt, 'IoU')
-
 
 
 
