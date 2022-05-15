@@ -66,35 +66,35 @@ Residuals connections seem to be very important both for learning and reaching a
 
 The results for the network types trained for 100 epochs with ADAM in pytorch with learning rate 1e-3 with the distillation network x8 are
 
-| Network               | Pixel Accuracy | mIoU |
-| --------------------- | -------------- | ---- |
-| IterativeV1           |                |      |
-| IterativeV2           |                |      |
-| IterativeV3           |                |      |
-| IterativeV4           |                |      |
-| IterativeV5           |                |      |
-| IterativeV6           |                |      |
-| Hourglass             |                |      |
-| Hourglass_iter        |                |      |
-| Hourglass_iter_ex     |                |      |
-| res_Hourglass         |                |      |
-| res_Hourglass_iter    |                |      |
-| res_Hourglass_iter_ex |                |      |
+| Network               | Pixel Accuracy (%) | mIoU (%) |
+| --------------------- | ------------------ | -------- |
+| IterativeV1           | 94.2               | 63.7     |
+| IterativeV2           | 91.7               | 58.7     |
+| IterativeV3           | 93.8               | 53.0     |
+| IterativeV4           | 95.7               | 71.6     |
+| IterativeV5           | 97.9               | 59.2     |
+| IterativeV6           | 95.7               | 74.6     |
+| Hourglass             | 91.9               | 59.6     |
+| Hourglass_iter        | 97.1               | 51.2     |
+| Hourglass_iter_ex     | 97.6               | 59.4     |
+| res_Hourglass         | 97.9               | 85.2     |
+| res_Hourglass_iter    | 97.7               | 58.7     |
+| res_Hourglass_iter_ex | 88.9               | 56.7     |
 
 the networks which seemes to perform well were then trained with the same parameters for 250 epochs
 
-| Network               | Pixel Accuracy | mIoU |
-| --------------------- | -------------- | ---- |
-| IterativeV1           |                |      |
+| Network               | Pixel Accuracy (%) | mIoU (%) |
+| --------------------- | ------------------ | -------- |
+| IterativeV1           | 95.2               | 70.0     |
 | IterativeV2           |                |      |
 | IterativeV3           |                |      |
-| IterativeV4           |                |      |
+| IterativeV4           | 95.7               | 79.3     |
 | IterativeV5           |                |      |
-| IterativeV6           |                |      |
+| IterativeV6           | 96.1               | 63.1     |
 | Hourglass             |                |      |
 | Hourglass_iter        |                |      |
 | Hourglass_iter_ex     |                |      |
-| res_Hourglass         |                |      |
+| res_Hourglass         | 94.4               | 70.6     |
 | res_Hourglass_iter    |                |      |
 | res_Hourglass_iter_ex |                |      |
 
