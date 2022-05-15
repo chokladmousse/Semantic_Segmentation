@@ -47,7 +47,7 @@ class Network(nn.Module):
         raise Exception('Not a valid normalization')
 
     def forward(self, x):
-      out = torch.empty(self.max_stack, x.shape[0], self.num_class, self.dim[0], self.dim[1]).to(x.device)
+      out = torch.empty(self.max_stack+1, x.shape[0], self.num_class, self.dim[0], self.dim[1]).to(x.device)
       
       # Distill input image
       hidden     = self.prenet(x)
@@ -58,7 +58,7 @@ class Network(nn.Module):
       # Compute initial hidden state
       hidden = self.init_net(hidden_con)
       hidden_cat = torch.cat((copy_input, hidden), 1)
-      hidden_con = self.ReLU(self.bn3(self.extractor(hidden_cat)))
+      hidden_con = self.ReLU(self.bn1(self.extractor(hidden_cat)))
 
       for i in range(self.max_stack):
         # Compute predicted segmentation from hidden state
@@ -68,7 +68,7 @@ class Network(nn.Module):
 
         # Add distilled input image to previous hidden state
         hidden_cat = torch.cat((copy_input, hidden), 1)
-        hidden_con = self.ReLU(self.bn3(self.extractor(hidden_cat)))
+        hidden_con = self.ReLU(self.bn1(self.extractor(hidden_cat)))
 
         # Improve hidden state
         hidden = self.iter_net(residual + self.alpha * hidden_con)
