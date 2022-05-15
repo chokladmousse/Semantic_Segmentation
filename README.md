@@ -39,7 +39,7 @@ The hourglass network types are inspired by (small variations of) the network fr
 
 Copy input: The input to the first network is copied and fed into the hourglass module at each iteration so each module doesn't need to extract all the information from the input at once.
 
-Copy-ex: 
+Copy-ex: The extractor for copy-input shares the same weights for all hourglass modules, copy-ex has new weights for each extractor for each module
 
 Residual connections: Residual connections from input to output of network.
 
