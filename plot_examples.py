@@ -28,14 +28,16 @@ def load(config):
     resume = os.path.join('exp', opt.exp)
     if opt.best:
       resume_file = os.path.join(resume, 'best_checkpoint.pt')
+      print("=> loading best checkpoint '{}'".format(resume))
     else:
       resume_file = os.path.join(resume, 'checkpoint.pt')
-    
-#     resume_file = os.path.join(resume, 'checkpoint.pt')
+      print("=> loading checkpoint '{}'".format(resume))
 
     if os.path.isfile(resume_file):
-        print("=> loading checkpoint '{}'".format(resume))
         checkpoint = torch.load(resume_file, map_location=config['device'])
+
+        # print(checkpoint['inference'])
+        # error(':)')
 
         config['inference']['net'].load_state_dict(checkpoint['state_dict'])
         config['train']['optimizer'].load_state_dict(checkpoint['optimizer'])
@@ -86,10 +88,11 @@ def make_pictures(config, data_func, phase):
     config['n'] = 0
     config['phase'] = phase
     for _, (inputs, labels) in tqdm.tqdm(enumerate(dataloader), total=np.ceil(config['opt'].n/len(dataloader)).astype('int'), ascii=True):
-      if config['n'] > config['opt'].n:
-        break
 
       make_picture_minibatch(config, phase, inputs, labels)
+      
+      if config['n'] >= config['opt'].n:
+        break
 
 
 def init():
@@ -135,6 +138,5 @@ if __name__ == "__main__":
       make_pictures(config, data_func, phase)
     
     print("=> Completed")
-
 
 
