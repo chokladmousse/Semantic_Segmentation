@@ -13,3 +13,9 @@ Network models which are trained are an iterative network (network is applied se
 | IterativeV4   |                 | x          | x                    |
 | IterativeV5   | x               |            | x                    |
 | IterativeV6   |                 |            | x                    |
+
+Initial network: An initial network produces a semantic segementation and then the iterative network is applied N times
+
+Copy input: The input to the initial network (or the iterative network if there is no initial network) is copied and fed into the network at each iteration so the iterative network doesn't need to extract all the information from the input at once
+
+Residual connections: Residual connections from input to output of network
