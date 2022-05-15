@@ -43,7 +43,6 @@ class HourglassBlock(nn.Module):
         self.inner = None
         self.high = Block(f_out, f_in, newdim, config['normalization'], down=True)
     
-      # self.up = nn.Upsample(scale_factor=2, mode='nearest')
       self.up = nn.ConvTranspose2d(f_in, f_in, 2, 2)
         
       self.alpha = nn.Parameter(torch.tensor(0.))
