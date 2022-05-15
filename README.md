@@ -60,7 +60,7 @@ Residual connections: Residual connections from input to output of network.
 
 The iterative network structures seems promising while having a very small footprint in memory (1/5th the size of the same hourglass network), further testing is required on different problems, preferably with more data.
 
-The hourglass network could most likely be successfully applied to semantic segmentation but the model becomes very big so it cannot produce a large ouput. Residuals connections seem to be very important both for learning and reaching a high accuracy.
+The hourglass network could most likely be successfully applied to semantic segmentation but the model becomes very big so it cannot produce a large ouput. Residual connections seem to be very important both for learning and reaching a high accuracy.
 
 All the values that are reported are results on a deterministic (same for all experiments) validation set. More data is most likely needed to test the true potential of the models.
 
