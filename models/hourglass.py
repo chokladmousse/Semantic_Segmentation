@@ -18,10 +18,10 @@ class Network(nn.Module):
       self.max_stack = config['max_stack']
 
       # Hourglass modules
-      self.hgs = [base_network(config) for i in range(self.max_stack)]
+      self.hgs = nn.ModuleList( [nn.Sequential(base_network(config)) for i in range(self.max_stack)])
         
       # Convolutional layers needed for classification and making sure everything has the correct number of channels
-      self.classifier = nn.Conv2d(config['f'], config['num_class'], 1)
+      self.classifier   = nn.Conv2d(config['f'], config['num_class'], 1)
       self.declassifier = nn.Conv2d(config['num_class'], config['f'], 1)
 
       # Residual connection alpha and activation function
