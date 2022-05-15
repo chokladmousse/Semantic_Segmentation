@@ -39,7 +39,7 @@ def make_network(configs):
     network = network_lib.Network(config)
     forward_net = DataParallel(network.to(configs['device']))
 
-    loss = loss_func.DiceLoss(config)
+    loss = loss_func.DiceLoss(config).to(configs['device'])
     
     def calc_loss(out, labels):
         return loss(out, labels)
