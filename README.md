@@ -64,7 +64,7 @@ The hourglass network could most likely be successfully applied to semantic segm
 
 All the values that are reported are results on a deterministic (same for all experiments) validation set. More data is most likely needed to test the true potential of the models.
 
-The results for the network types trained for 100 epochs with ADAM in pytorch with learning rate 1e-3 with the distillation network x8 are
+The results for the network types trained for 100 epochs with ADAM in pytorch, learning rate 1e-3 and the distillation network x8 are
 
 | Network               | Pixel Accuracy (%) | mIoU (%) |
 | --------------------- | ------------------ | -------- |
