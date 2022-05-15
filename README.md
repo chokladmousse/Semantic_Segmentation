@@ -5,6 +5,19 @@ Two main network types are tested, an iterative network which tries to (iterativ
 
 # Network types
 
+## Initial network
+
+To make training times faster a distillation network was trained which made the input picture smaller and a segmentation of this smaller picture was the training label.
+
+The distillation networks are
+
+| Network | Size of ouput compared to input |
+| :-----: | :-----------------------------: |
+| x1      | 1                               |
+| x2      | 1/4                             |
+| x4      | 1/16                            |
+| x8      | 1/64                            |
+
 ## Iterative
 
 The iterative network type has an iterative network which is applied to its own output and possibly an initial network which generates an initial semantic segmentation.
@@ -50,3 +63,45 @@ The iterative network structures seems promising while having a very small footp
 The hourglass network could most likely be successfully applied to semantic segmentation but the model becomes very big so it cannot produce a large ouput.
 
 Residuals connections seem to be very important both for learning and reaching a high accuracy.
+
+The results for the network types trained for 100 epochs with ADAM in pytorch with learning rate 1e-3 with the distillation network x8 are
+
+| Network               | Pixel Accuracy | mIoU |
+| --------------------- | -------------- | ---- |
+| IterativeV1           |                |      |
+| IterativeV2           |                |      |
+| IterativeV3           |                |      |
+| IterativeV4           |                |      |
+| IterativeV5           |                |      |
+| IterativeV6           |                |      |
+| Hourglass             |                |      |
+| Hourglass_iter        |                |      |
+| Hourglass_iter_ex     |                |      |
+| res_Hourglass         |                |      |
+| res_Hourglass_iter    |                |      |
+| res_Hourglass_iter_ex |                |      |
+
+the networks which seemes to perform well were then trained with the same parameters for 250 epochs
+
+| Network               | Pixel Accuracy | mIoU |
+| --------------------- | -------------- | ---- |
+| IterativeV1           |                |      |
+| IterativeV2           |                |      |
+| IterativeV3           |                |      |
+| IterativeV4           |                |      |
+| IterativeV5           |                |      |
+| IterativeV6           |                |      |
+| Hourglass             |                |      |
+| Hourglass_iter        |                |      |
+| Hourglass_iter_ex     |                |      |
+| res_Hourglass         |                |      |
+| res_Hourglass_iter    |                |      |
+| res_Hourglass_iter_ex |                |      |
+
+and the iterativeV6 network type was also trained with the same parameters but with x2 as the distillation network
+
+| Network               | Pixel Accuracy | mIoU |
+| --------------------- | -------------- | ---- |
+| IterativeV6           |                |      |
+
+The accuracy could be better but imporovement does seem to happen at each iteration which can be seen on the plot of mIoU.
