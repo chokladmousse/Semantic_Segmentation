@@ -86,22 +86,14 @@ the networks which seemes to perform well were then trained with the same parame
 | Network               | Pixel Accuracy (%) | mIoU (%) |
 | --------------------- | ------------------ | -------- |
 | IterativeV1           | 95.2               | 70.0     |
-| IterativeV2           |                |      |
-| IterativeV3           |                |      |
-| IterativeV4           | 95.7               | 79.3     |
-| IterativeV5           |                |      |
-| IterativeV6           | 96.1               | 63.1     |
-| Hourglass             |                |      |
-| Hourglass_iter        |                |      |
-| Hourglass_iter_ex     |                |      |
-| res_Hourglass         | 94.4               | 70.6     |
-| res_Hourglass_iter    |                |      |
-| res_Hourglass_iter_ex |                |      |
+| IterativeV4           | 96.5               | 79.3     |
+| IterativeV6           | 96.1               | 65.3     |
+| res_Hourglass         | 98.0               | 97.8     |
 
 and the iterativeV6 network type was also trained with the same parameters but with x2 as the distillation network
 
-| Network               | Pixel Accuracy | mIoU |
-| --------------------- | -------------- | ---- |
-| IterativeV6           |                |      |
+| Network               | Pixel Accuracy (%) | mIoU (%) |
+| --------------------- | ------------------ | -------- |
+| IterativeV6           | 96.8               | 88.0     |
 
 The accuracy could be better but imporovement does seem to happen at each iteration which can be seen on the plot of mIoU.
