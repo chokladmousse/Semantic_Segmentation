@@ -60,9 +60,9 @@ Residual connections: Residual connections from input to output of network.
 
 The iterative network structures seems promising while having a very small footprint in memory (1/5th the size of the same hourglass network), further testing is required on different problems, preferably with more data.
 
-The hourglass network could most likely be successfully applied to semantic segmentation but the model becomes very big so it cannot produce a large ouput.
+The hourglass network could most likely be successfully applied to semantic segmentation but the model becomes very big so it cannot produce a large ouput. Residuals connections seem to be very important both for learning and reaching a high accuracy.
 
-Residuals connections seem to be very important both for learning and reaching a high accuracy.
+All the values that are reported are results on a deterministic (same for all experiments) validation set. More data is most likely needed to test the true potential of the models.
 
 The results for the network types trained for 100 epochs with ADAM in pytorch with learning rate 1e-3 with the distillation network x8 are
 
@@ -96,4 +96,4 @@ and the iterativeV6 network type was also trained with the same parameters but w
 | --------------------- | ------------------ | -------- |
 | IterativeV6           | 96.8               | 88.0     |
 
-The accuracy could be better but imporovement does seem to happen at each iteration which can be seen on the plot of mIoU.
+The accuracy could be better but improvement does seem to happen at each iteration which can be seen on the plot of mIoU.
